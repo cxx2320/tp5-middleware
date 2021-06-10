@@ -1,7 +1,7 @@
 {
     "name": "cxx/tp5-middleware",
-    "description": "tp5-middleware",
-    "type": "project",
+    "description": "tp5-middleware,中间件,middleware,thinkphp5",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
