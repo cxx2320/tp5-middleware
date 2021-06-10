@@ -19,7 +19,7 @@ return [
     // 模块初始化
     'module_init'  => [
         // !! 此行代码
-        'Cxx\Codetool\MiddlewareHandle::moduleInit'
+        'Cxx\Tp5Middleware\MiddlewareHandle::moduleInit'
     ],
     // 操作开始执行
     'action_begin' => [],
@@ -30,11 +30,11 @@ return [
     // 应用结束
     'app_end'      => [
         // !! 此行代码
-        'Cxx\Codetool\MiddlewareHandle::appEnd'
+        'Cxx\Tp5Middleware\MiddlewareHandle::appEnd'
     ],
     'response_end' => [
         // !! 此行代码
-        'Cxx\Codetool\MiddlewareHandle::responseEnd'
+        'Cxx\Tp5Middleware\MiddlewareHandle::responseEnd'
     ]
 ];
 
@@ -100,7 +100,9 @@ return [
 
 ## 调用顺序
 前置方法->后置方法
+
 `global -> module -> controller -> action -> (核心代码) -> action -> controller -> module -> global`
 
 响应结束方法
+
 `global -> module -> controller -> action`
