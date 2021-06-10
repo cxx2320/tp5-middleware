@@ -1,0 +1,20 @@
+{
+    "name": "cxx/tp5-middleware",
+    "description": "tp5-middleware",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "cxx",
+            "email": "cxx2320@foxmail.com"
+        }
+    ],
+    "require": {
+        "topthink/framework": "5.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+           "Cxx\\Tp5Middleware\\": "src/"
+        }
+    }
+}
