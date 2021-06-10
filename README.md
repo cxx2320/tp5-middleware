@@ -65,9 +65,8 @@ class Middle1
     public function end($request, $response){}
 }
 ```
-3. 使用
+3. 使用(创建 `application\extra\middleware.php` 文件)
 ```php
-use app\index\controller\Index;
 
 return [
     // 全局中间件
