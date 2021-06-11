@@ -9,9 +9,7 @@
             "email": "cxx2320@foxmail.com"
         }
     ],
-    "require": {
-        "topthink/framework": "5.0.*"
-    },
+    "require": {},
     "autoload": {
         "psr-4": {
            "Cxx\\Tp5Middleware\\": "src/"

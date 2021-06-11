@@ -9,7 +9,7 @@
 
 `composer require cxx/tp5-middleware`
 
-1. 在`application\tags.php`中添加
+1. 在 `application\tags.php` 中添加
 ```php
 return [
     // 应用初始化
@@ -41,8 +41,18 @@ return [
 ```
 2. 创建中间件(三个方法都是可选的,类写在哪里都无所谓，只要能被加载)
 
-也可以使用命令行直接创建`php think make:middleware Test`,会生成`application/middleware/Test.php`文件
 
+ * 命令行
+ 
+ 在 `applocation\command.php` 添加
+```php
+    return [
+        Cxx\Tp5Middleware\MiddlewareCommand::class
+    ];
+```
+  使用命令行直接创建 `php think make:middleware Test` ,会生成 `application/middleware/Test.php` 文件
+
+ * 手动创建
 ```php
 class Middle1
 {
