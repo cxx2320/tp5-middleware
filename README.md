@@ -99,21 +99,23 @@ return [
             Middle1::class
         ]
     ],
-    // 方法中间件
-    'action' => [
-        // 相应的方法
-        Index::class . '::index' => [
-            Middle1::class
-        ]
-    ],
 ];
+```
+
+控制器中间件的另一种定义方式
+```php
+protected $middleware = [
+    Middle1::class => ['except' => ['hello'] ],
+    Middle2::class => ['only' => ['hello'] ],
+];
+
 ```
 
 ## 调用顺序
 前置方法->后置方法
 
-`global -> module -> controller -> action -> (核心代码) -> action -> controller -> module -> global`
+`global -> module -> controller -> (核心代码) -> controller -> module -> global`
 
 响应结束方法
 
-`global -> module -> controller -> action`
+`global -> module -> controller`

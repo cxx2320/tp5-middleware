@@ -66,6 +66,7 @@ class MiddlewareHandle
         self::$dispatchController = Loader::parseClass(self::$dispatchModule, $config['url_controller_layer'], $controller, $config['controller_suffix']);
         self::$dispatchAction = $action;
         self::$middlewareConfig = Config::get('middleware');
+        self::registerControllerMiddleware(self::$dispatchController);
         
         self::dispatchMiddleware(
             self::getMiddlewares('global'),
@@ -83,12 +84,6 @@ class MiddlewareHandle
             $request,
             self::BEFORE_ACTION
         );
-
-        self::dispatchMiddleware(
-            self::getMiddlewares('action', self::$dispatchController . '::' . self::$dispatchAction),
-            $request,
-            self::BEFORE_ACTION
-        );
     }
 
     /**
@@ -96,12 +91,6 @@ class MiddlewareHandle
      */
     public static function appEnd($response)
     {
-        self::dispatchMiddleware(
-            self::getMiddlewares('action', self::$dispatchController . '::' . self::$dispatchAction, true),
-            $response,
-            self::AFTER_ACTION
-        );
-
         self::dispatchMiddleware(
             self::getMiddlewares('controller', self::$dispatchController, true),
             $response,
@@ -145,11 +134,6 @@ class MiddlewareHandle
             self::RESPONSE_END_ACTION
         );
 
-        self::dispatchMiddleware(
-            self::getMiddlewares('action', self::$dispatchController . '::' . self::$dispatchAction),
-            [$request, $response],
-            self::RESPONSE_END_ACTION
-        );
     }
 
     /**
@@ -159,7 +143,7 @@ class MiddlewareHandle
      * @param bool $is_reverse 是否反转
      * @return array
      */
-    private static function getMiddlewares($level = 'global', $key = '', $is_reverse = false)
+    public static function getMiddlewares($level = 'global', $key = '', $is_reverse = false)
     {
         if (!isset(self::$middlewareConfig[$level])) {
             return [];
@@ -197,6 +181,58 @@ class MiddlewareHandle
             }
             $obj = self::$container[$middleware];
             App::invokeMethod([$obj, $action], $param);
+        }
+    }
+
+    /**
+     * 使用反射机制注册控制器中间件
+     * @access public
+     * @param object $controller 控制器实例
+     * @return void
+     */
+    private static function registerControllerMiddleware($controller): void
+    {
+        $controller = App::invokeClass($controller);
+        $request_action = self::$dispatchAction;
+        
+        $class = new \ReflectionClass($controller);
+        
+        if ($class->hasProperty('middleware')) {
+            $reflectionProperty = $class->getProperty('middleware');
+            $reflectionProperty->setAccessible(true);
+
+            $middlewares = $reflectionProperty->getValue($controller); // 需要实例化控制器,由于框架后面还会实例化控制器,会调用两次,可能照成其他问题
+            // $middlewares = $reflectionProperty->getDefaultValue(); // 不需要实例化控制器,无法在控制器构造函数中动态改变中间件配置
+
+            foreach ($middlewares as $key => $val) {
+                if (!is_int($key)) {
+                    if (isset($val['only']) && !in_array($request_action, array_map(function ($item) {
+                        return strtolower($item);
+                    }, is_string($val['only']) ? explode(",", $val['only']) : $val['only']))) {
+                        continue;
+                    } elseif (isset($val['except']) && in_array($request_action, array_map(function ($item) {
+                        return strtolower($item);
+                    }, is_string($val['except']) ? explode(',', $val['except']) : $val['except']))) {
+                        continue;
+                    } else {
+                        $val = $key;
+                    }
+                }
+
+                if (is_string($val) && strpos($val, ':')) {
+                    $val = explode(':', $val);
+                    if (count($val) > 1) {
+                        $val = [$val[0], array_slice($val, 1)];
+                    }
+                }
+                if(!isset(self::$middlewareConfig['controller'][$controller])){
+                    self::$middlewareConfig['controller'][$controller] = [];
+                }
+                // @todo 进行别名解析，然后加载进 self::$middlewareConfig 里面
+                foreach ($val as $middleware) {
+                    self::$middlewareConfig['controller'][$controller][] = $middleware;
+                }
+            }
         }
     }
 }
