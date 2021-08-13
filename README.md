@@ -9,7 +9,7 @@
 
 `composer require cxx/tp5-middleware`
 
-1. 在 `application\tags.php` 中添加
+1. 行为绑定，在 `application\tags.php` 中添加
 ```php
 return [
     // 应用初始化
